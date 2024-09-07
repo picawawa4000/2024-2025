@@ -204,7 +204,7 @@ namespace libcardinal {
         return static_cast<ArrayOf>(array_holder);
     }
 
-    jvalue call_instance(jobject target, const char *name, const char *sig, jvalue *args) {
+    jvalue call_instance(jobject target, const char *name, const char *sig, jvalue ... args) {
         //libcardinal::exception_check();
         jclass clasz = libcardinal::jnienv->GetObjectClass(target);
         jmethodID id = libcardinal::jnienv->GetMethodID(clasz,
