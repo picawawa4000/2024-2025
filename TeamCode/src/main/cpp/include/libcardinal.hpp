@@ -11,6 +11,10 @@
 #include <exception>
 #include <locale>
 #include <codecvt>
+#include <vector>
+
+//Some of the stuff in here is unused and (maybe) slated for removal.
+//Most of it is actually quite helpful.
 
 namespace libcardinal {
 
@@ -204,7 +208,7 @@ namespace libcardinal {
         return static_cast<ArrayOf>(array_holder);
     }
 
-    jvalue call_instance(jobject target, const char *name, const char *sig, jvalue ... args) {
+    jvalue call_instance(jobject target, const char *name, const char *sig, jvalue * args) {
         //libcardinal::exception_check();
         jclass clasz = libcardinal::jnienv->GetObjectClass(target);
         jmethodID id = libcardinal::jnienv->GetMethodID(clasz,
@@ -234,6 +238,11 @@ namespace libcardinal {
         }
         return {.l=libcardinal::jnienv->NewGlobalRef(
                 libcardinal::jnienv->CallObjectMethodA(target, id, args))};
+    }
+
+    jvalue call_instance(jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return call_instance(target, name, sig, &argpack[0]);
     }
 
     jvalue altenv_call_instance(JNIEnv *env, jobject target, const char *name, const char *sig,
@@ -269,7 +278,12 @@ namespace libcardinal {
         return out;
     }
 
-    void call_void_instance(jobject target, const char *name, const char *sig, jvalue *args) {
+    jvalue altenv_call_instance(JNIEnv *env, jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return altenv_call_instance(env, target, name, sig, &argpack[0]);
+    }
+
+    void call_void_instance(jobject target, const char *name, const char *sig, jvalue * args) {
         //libcardinal::exception_check();
         jclass clasz = libcardinal::jnienv->GetObjectClass(target);
         jmethodID id = libcardinal::jnienv->GetMethodID(clasz,
@@ -278,12 +292,22 @@ namespace libcardinal {
         libcardinal::jnienv->CallVoidMethodA(target, id, args);
     }
 
+    void call_void_instance(jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        call_void_instance(target, name, sig, &argpack[0]);
+    }
+
     void altenv_call_void_instance(JNIEnv *env, jobject target, const char *name, const char *sig,
                                    jvalue *args) {
         jclass clasz = env->GetObjectClass(target);
         jmethodID id = env->GetMethodID(clasz, name, sig);
         env->DeleteLocalRef(clasz);
         env->CallVoidMethodA(target, id, args);
+    }
+
+    void altenv_call_void_instance(JNIEnv *env, jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        altenv_call_void_instance(env, target, name, sig, &argpack[0]);
     }
 
     jobject call_nonvirtual(jobject target, const char *name, const char *sig, jvalue *args) {
@@ -295,10 +319,20 @@ namespace libcardinal {
                                                                        target), id, args);
     }
 
+    jobject call_nonvirtual(jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return call_nonvirtual(target, name, sig, &argpack[0]);
+    }
+
     jobject altenv_call_nonvirtual(JNIEnv *env, jobject target, const char *name, const char *sig,
                                    jvalue *args) {
         jmethodID id = env->GetMethodID(env->GetObjectClass(target), name, sig);
         return env->CallNonvirtualObjectMethodA(target, env->GetObjectClass(target), id, args);
+    }
+
+    jobject altenv_call_nonvirtual(JNIEnv *env, jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return altenv_call_nonvirtual(env, target, name, sig, &argpack[0]);
     }
 
     jvalue call_static(jobject target, const char *name, const char *sig, jvalue *args) {
@@ -331,10 +365,45 @@ namespace libcardinal {
                 libcardinal::jnienv->GetObjectClass(target), id, args)};
     }
 
-    jobject altenv_call_static(JNIEnv *env, jobject target, const char *name, const char *sig,
+    jvalue call_static(jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return call_static(target, name, sig, &argpack[0]);
+    }
+
+    jvalue altenv_call_static(JNIEnv *env, jobject target, const char *name, const char *sig,
                                jvalue *args) {
-        jmethodID id = env->GetStaticMethodID(env->GetObjectClass(target), name, sig);
-        return env->CallStaticObjectMethodA(env->GetObjectClass(target), id, args);
+        //libcardinal::exception_check();
+        jmethodID id = env->GetStaticMethodID(
+                env->GetObjectClass(target), name, sig);
+        char sig_last_char = sig[strlen(sig) - 1];
+        char sig_second_last_char = sig[strlen(sig) - 2];
+        if (sig_second_last_char == '[') {
+            return {.l=env->CallObjectMethodA(env->GetObjectClass(target), id, args)};
+        }
+        if (sig_last_char == 'Z') {
+            return {.z=env->CallStaticBooleanMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'B') {
+            return {.b=env->CallStaticByteMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'S') {
+            return {.s=env->CallStaticShortMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'I') {
+            return {.i=env->CallStaticIntMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'J') {
+            return {.j=env->CallStaticLongMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'C') {
+            return {.c=env->CallStaticCharMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'F') {
+            return {.f=env->CallStaticFloatMethodA(env->GetObjectClass(target), id, args)};
+        } else if (sig_last_char == 'D') {
+            return {.d=env->CallStaticDoubleMethodA(env->GetObjectClass(target), id, args)};
+        }
+        return {.l=env->CallStaticObjectMethodA(
+                env->GetObjectClass(target), id, args)};
+    }
+
+    jvalue altenv_call_static(JNIEnv *env, jobject target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return altenv_call_static(env, target, name, sig, &argpack[0]);
     }
 
     jvalue call_static(jclass target, const char *name, const char *sig, jvalue *args) {
@@ -365,6 +434,11 @@ namespace libcardinal {
         return {.l=libcardinal::jnienv->CallStaticObjectMethodA(target, id, args)};
     }
 
+    jvalue call_static(jclass target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return call_static(target, name, sig, &argpack[0]);
+    }
+
     jvalue altenv_call_static(JNIEnv *env, jclass target, const char *name, const char *sig,
                                jvalue *args) {
         jmethodID id = env->GetStaticMethodID(target, name, sig);
@@ -391,6 +465,11 @@ namespace libcardinal {
             return {.d=env->CallStaticDoubleMethodA(target, id, args)};
         }
         return {.l=env->NewGlobalRef(env->CallStaticObjectMethodA(target, id, args))};
+    }
+
+    jvalue altenv_call_static(JNIEnv *env, jclass target, const char *name, const char *sig, jvalue args...) {
+        std::vector<jvalue> argpack{args};
+        return altenv_call_static(env, target, name, sig, &argpack[0]);
     }
 
     std::string get_enum_name(jobject target) {
