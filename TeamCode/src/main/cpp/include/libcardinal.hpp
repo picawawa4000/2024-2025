@@ -638,7 +638,8 @@ and a declaration of runOpMode() plus some camera functions (see next
 example); all the rest is done in C++
 */
 extern "C" JNIEXPORT void
-JNICALL Java_org_firstinspires_ftc_teamcode_libcardinal_runOpMode(JNIEnv *env, jobject thiz) {
+JNICALL  __attribute__((unused))
+Java_org_firstinspires_ftc_teamcode_libcardinal_runOpMode(JNIEnv *env, jobject thiz) {
     //Set up libcardinal's JNI environment so libcardinal works correctly
     libcardinal::setenv(env);
     //Set up a TelemetryStream
@@ -662,7 +663,8 @@ jobject camera;
 jobject serialThreadPool;
 
 extern "C" JNIEXPORT void
-JNICALL Java_org_firstinspires_ftc_teamcode_CameraTest_runOpMode(JNIEnv *env, jobject thiz) {
+JNICALL  __attribute__((unused))
+Java_org_firstinspires_ftc_teamcode_CameraTest_runOpMode(JNIEnv *env, jobject thiz) {
     libcardinal::setenv(env);
     jobject cameraName = libcardinal::get_device_from_hardware_map(thiz, "webcam");
     jobject cameraManager = libcardinal::call_instance(
@@ -754,13 +756,15 @@ JNICALL Java_org_firstinspires_ftc_teamcode_CameraTest_runOpMode(JNIEnv *env, jo
 
 //Process a frame from the camera
 
-extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_libcardinal_00024CaptureCallback_onNewFrame(JNIEnv * env, jobject thiz, jobject session, jobject request, jobject frame) {
+extern "C" JNIEXPORT void JNICALL  __attribute__((unused))
+Java_org_firstinspires_ftc_teamcode_libcardinal_00024CaptureCallback_onNewFrame(JNIEnv * env, jobject thiz, jobject session, jobject request, jobject frame) {
 
 }
 
 //Set up the camera more
 
-extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_libcardinal_00024StateCallback_onConfigured(JNIEnv * env, jobject thiz, jobject session) {
+extern "C" JNIEXPORT void JNICALL  __attribute__((unused))
+Java_org_firstinspires_ftc_teamcode_libcardinal_00024StateCallback_onConfigured(JNIEnv * env, jobject thiz, jobject session) {
     jvalue args[1] = {
             libcardinal::altenv_get_static_field(
                     env,

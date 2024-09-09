@@ -4,7 +4,7 @@
 #include <libcardinal.hpp>
 
 void run(JNIEnv * env, jobject thiz) {
-
+    
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_RemoteOperation_run(
