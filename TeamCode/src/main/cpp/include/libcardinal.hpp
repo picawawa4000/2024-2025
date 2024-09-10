@@ -76,11 +76,23 @@ namespace libcardinal {
         return libcardinal::jnienv->NewObjectA(target, constructor, constructor_args);
     }
 
+    jobject
+    new_instance(const char *id, const char *constructor_sig, jvalue constructor_args...) {
+        std::vector<jvalue> argpack{constructor_args};
+        return new_instance(id, constructor_sig, &argpack[0]);
+    }
+
     jobject altenv_new_instance(JNIEnv *env, const char *id, const char *constructor_sig,
                                 const jvalue *constructor_args) {
         jclass target = env->FindClass(id);
         jmethodID constructor = env->GetMethodID(target, "<init>", constructor_sig);
         return env->NewObjectA(target, constructor, constructor_args);
+    }
+
+    jobject
+    altenv_new_instance(JNIEnv *env, const char *id, const char *constructor_sig, jvalue constructor_args...) {
+        std::vector<jvalue> argpack{constructor_args};
+        return altenv_new_instance(env, id, constructor_sig, &argpack[0]);
     }
 
     jobject alloc_instance(const char *id) {
@@ -784,12 +796,23 @@ Java_org_firstinspires_ftc_teamcode_CameraTest_runOpMode(JNIEnv *env, jobject th
             {.l=cameraName},
             {.l=(jobject)nullptr} //NULL i think
     };
+    /*camera = env->NewGlobalRef(libcardinal::call_instance(
+            cameraManager,
+            "requestPermissionAndOpenCamera",
+            "(Lorg/firstinspires/ftc/robotcore/internal/system/Deadline;Lorg/firstinspires/ftc/robotcore/external/hardware/camera/CameraName;Lorg/firstinspires/ftc/robotcore/external/function/Continuation;)Lorg/firstinspires/ftc/robotcore/external/hardware/camera/Camera;",
+            args).l);*/
     camera = env->NewGlobalRef(libcardinal::call_instance(
             cameraManager,
             "requestPermissionAndOpenCamera",
             "(Lorg/firstinspires/ftc/robotcore/internal/system/Deadline;Lorg/firstinspires/ftc/robotcore/external/hardware/camera/CameraName;Lorg/firstinspires/ftc/robotcore/external/function/Continuation;)Lorg/firstinspires/ftc/robotcore/external/hardware/camera/Camera;",
-            args
-            ).l);
+            libcardinal::to_jvalue(
+                    libcardinal::new_instance(
+                    "org/firstinspires/ftc/robotcore/internal/system/Deadline",
+                    "(JLjava/util/concurrent/TimeUnit;)V",
+                    cargs)),
+            libcardinal::to_jvalue(cameraName),
+            libcardinal::to_jvalue(nullptr)
+    ).l);
     cameraCharacteristics = env->NewGlobalRef(
             libcardinal::call_instance(
                 libcardinal::call_instance(

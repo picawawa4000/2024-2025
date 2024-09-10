@@ -11,10 +11,6 @@ public class RemoteOperation extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
-    }
-
-    public void doStuff(int something) {
-        int somethingElse = something + 2;
+        this.run();
     }
 }
