@@ -58,6 +58,16 @@ namespace libcardinal {
 
 //Java interface functions for generic usage
 
+    jvalue to_jvalue(jobject l) {return {.l=l};}
+    jvalue to_jvalue(jint i) {return {.i=i};}
+    jvalue to_jvalue(jbyte b) {return {.b=b};}
+    jvalue to_jvalue(jchar c) {return {.c=c};}
+    jvalue to_jvalue(jdouble d) {return {.d=d};}
+    jvalue to_jvalue(jfloat f) {return {.f=f};}
+    jvalue to_jvalue(jlong j) {return {.j=j};}
+    jvalue to_jvalue(jshort s) {return {.s=s};}
+    jvalue to_jvalue(jboolean z) {return {.z=z};}
+
     jobject
     new_instance(const char *id, const char *constructor_sig, const jvalue *constructor_args) {
         //libcardinal::exception_check();

@@ -31,7 +31,8 @@
 #define JNICALL __stdcall
 
 // 'long' is always 32 bit on windows so this matches what jdk expects
-typedef long jint;
+// we're not on windows though
+typedef __int32_t jint;
 typedef __int64_t jlong;
 typedef signed char jbyte;
 
