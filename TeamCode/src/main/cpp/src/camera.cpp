@@ -85,7 +85,7 @@ Camera::~Camera() {
     this->env->DeleteGlobalRef(this->serialThreadPool);
 }
 
-void Camera::record(std::function<void(JNIEnv*,std::vector<unsigned char>)> handler) {
+void Camera::record(std::function<void(JNIEnv*,int,int,std::vector<unsigned char>)> handler) {
     if (this->recording) {
         output("WARNING: Camera attempted to start second recording session.");
         return;
@@ -197,6 +197,11 @@ void Camera::onConfigured(JNIEnv *altenv, jobject cameraCaptureSession) {
             libcardinal::altenv_call_instance(env,streamingMode,"getFramesPerSecond","()I",nullptr)
     ).l;
 
+    //Stores the size of the frames so we know how big they are
+    jobject fsize = libcardinal::altenv_call_instance(env,streamingMode,"getSize","()Lorg/firstinspires/ftc/robotcore/external/android/util/Size;",nullptr).l;
+    this->xsize = libcardinal::altenv_call_instance(env,fsize,"getWidth","()I",nullptr).i;
+    this->ysize = libcardinal::altenv_call_instance(env,fsize,"getHeight","()I",nullptr).i;
+
     //Tells the camera to start processing frames
     //The climactic conclusion of all this madness
     libcardinal::altenv_call_instance(
@@ -236,7 +241,7 @@ void Camera::onNewFrame(JNIEnv *altenv, jobject camera_frame) {
     jbyte * rdata = altenv->GetByteArrayElements(data, JNI_FALSE);
     jsize length = altenv->GetArrayLength(data);
     std::vector<unsigned char> frame_data(rdata, rdata + length - 1);
-    this->frameHandler(altenv, frame_data);
+    this->frameHandler(altenv, this->xsize, this->ysize, frame_data);
 }
 
 //More JNI wrapper functions!

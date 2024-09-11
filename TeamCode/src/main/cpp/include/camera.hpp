@@ -19,7 +19,8 @@ struct Camera {
     //Starts a recording, passing every frame to handler
     //Keep in mind that the handler runs in a different thread
     //than the main program, and thus has a different JNI env
-    void record(std::function<void(JNIEnv *, std::vector<unsigned char>)> handler);
+    //Argument format to handler: env, xsize, ysize, data
+    void record(std::function<void(JNIEnv *, int, int, std::vector<unsigned char>)> handler);
 
     //Stops the current recording
     void stop();
@@ -49,7 +50,8 @@ private:
     jobject serialThreadPool;
     jobject currentCaptureSession;
     bool recording;
-    std::function<void(JNIEnv *, std::vector<unsigned char>)> frameHandler;
+    std::function<void(JNIEnv *, int, int, std::vector<unsigned char>)> frameHandler;
+    int xsize, ysize;
 };
 
 #endif

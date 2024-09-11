@@ -11,6 +11,8 @@
 //I don't know if I'll wind up keeping this or not...
 using namespace libcardinal;
 
+//The logging function that we use when one of my libraries
+//wants a logging function
 auto log_lambda = [](const std::string& out){
     print("%s", out.c_str());
 };
