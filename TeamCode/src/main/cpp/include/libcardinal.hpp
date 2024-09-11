@@ -899,11 +899,11 @@ Java_org_firstinspires_ftc_teamcode_libcardinal_00024StateCallback_onConfigured(
                     ),
             {
                 .l=libcardinal::altenv_new_instance(
-                        env,
-                        "org/firstinspires/ftc/robotcore/external/android/util/Size",
-                        "(II)V",
-                        dargs
-                        )
+            env,
+            "org/firstinspires/ftc/robotcore/external/android/util/Size",
+            "(II)V",
+            dargs
+            )
             }
     };
     jvalue jargs[4] = {

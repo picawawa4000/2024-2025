@@ -26,12 +26,14 @@ add_library( # Sets the name of the library.
 
 # Sets the include folder(s) and does linking stuff. Not generated.
 
-target_include_directories(main PRIVATE include)
+target_include_directories(main PUBLIC include)
 
 # TODO: Fix these parts.
 
-set(SOURCES src/camera.cpp include/camera.hpp)
-add_executable(main ${SOURCES})
+set(SOURCES src/camera.cpp src/hardware.cpp include/camera.hpp include/hardware.hpp)
+add_executable(test ${SOURCES})
+
+target_include_directories(test PUBLIC include)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

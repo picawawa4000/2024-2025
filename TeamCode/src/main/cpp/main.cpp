@@ -3,10 +3,21 @@
 #include <jni.h>
 #include <libcardinal.hpp>
 #include <camera.hpp>
+#include <android/log.h>
+
+#define LOGGER_NAME "milk"
+#define print(...) __android_log_print(ANDROID_LOG_INFO, LOGGER_NAME, __VA_ARGS__)
+
+//I don't know if I'll wind up keeping this or not...
+using namespace libcardinal;
+
+auto log_lambda = [](const std::string& out){
+    print("%s", out.c_str());
+};
 
 //Entry point for the program.
 void run(JNIEnv * env, jobject thiz) {
-
+    camera::set_logger(log_lambda);
 }
 
 //Everything below here is a JNI wrapper function. Don't touch unless adding or removing one.
