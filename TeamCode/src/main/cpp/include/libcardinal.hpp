@@ -738,6 +738,7 @@ Notice that, in the Java file, we only have a call to System.loadLibrary()
 and a declaration of runOpMode() plus some camera functions (see next
 example); all the rest is done in C++
 */
+/*
 extern "C" JNIEXPORT void
 JNICALL  __attribute__((unused))
 Java_org_firstinspires_ftc_teamcode_libcardinal_runOpMode(JNIEnv *env, jobject thiz) {
@@ -753,12 +754,14 @@ Java_org_firstinspires_ftc_teamcode_libcardinal_runOpMode(JNIEnv *env, jobject t
     out << "Output from native: 5";
     //libcardinal::report_telemetry_for(thiz, "Output from native", "5");
 }
+*/
 
 /*
 An example of how to interact with hardware devices from C++
 (I inadvertently chose the worst one)
 */
 
+/*
 jobject cameraCharacteristics;
 jobject camera;
 jobject serialThreadPool;
@@ -796,11 +799,11 @@ Java_org_firstinspires_ftc_teamcode_CameraTest_runOpMode(JNIEnv *env, jobject th
             {.l=cameraName},
             {.l=(jobject)nullptr} //NULL i think
     };
-    /*camera = env->NewGlobalRef(libcardinal::call_instance(
+    camera = env->NewGlobalRef(libcardinal::call_instance(
             cameraManager,
             "requestPermissionAndOpenCamera",
             "(Lorg/firstinspires/ftc/robotcore/internal/system/Deadline;Lorg/firstinspires/ftc/robotcore/external/hardware/camera/CameraName;Lorg/firstinspires/ftc/robotcore/external/function/Continuation;)Lorg/firstinspires/ftc/robotcore/external/hardware/camera/Camera;",
-            args).l);*/
+            args).l);
     camera = env->NewGlobalRef(libcardinal::call_instance(
             cameraManager,
             "requestPermissionAndOpenCamera",
@@ -982,5 +985,6 @@ Java_org_firstinspires_ftc_teamcode_libcardinal_00024StateCallback_onConfigured(
             pargs
             );
 }
+*/
 
 #endif

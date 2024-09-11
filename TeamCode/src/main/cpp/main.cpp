@@ -5,6 +5,8 @@
 #include <camera.hpp>
 #include <android/log.h>
 
+#include <opencv2/core.hpp>
+
 #define LOGGER_NAME "milk"
 #define print(...) __android_log_print(ANDROID_LOG_INFO, LOGGER_NAME, __VA_ARGS__)
 

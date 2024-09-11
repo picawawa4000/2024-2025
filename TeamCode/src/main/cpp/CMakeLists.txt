@@ -10,6 +10,11 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project("main")
 
+# Finds OpenCV, which is in libs/OpenCV-android-sdk in the root folder
+
+set(OpenCV_DIR /Users/academia/2024-2025/libs/OpenCV-android-sdk/sdk/native/jni)
+find_package(OpenCV REQUIRED)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -30,9 +35,12 @@ target_include_directories(main PUBLIC include)
 
 # TODO: Fix these parts.
 
-set(HEADERS include/camera.hpp include/hardware.hpp)
-file(GLOB SOURCES src/*)
-add_executable(test ${HEADERS} ${SOURCES})
+set(SOURCES src/camera.cpp src/hardware.cpp include/camera.hpp include/hardware.hpp)
+
+file(GLOB APRILTAGS_H include/AprilTags/*)
+file(GLOB APRILTAGS_S src/AprilTags/*)
+
+add_executable(test ${SOURCES} ${APRILTAGS_S} ${APRILTAGS_H})
 
 target_include_directories(test PUBLIC include)
 
@@ -58,4 +66,6 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} )
+                       ${log-lib}
+
+                       ${OpenCV_LIBS})
