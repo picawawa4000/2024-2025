@@ -1,11 +1,12 @@
 #include <hardware.hpp>
 #include <libcardinal.hpp>
 
-DcMotor::DcMotor(JNIEnv *env, jobject opmode, std::string name) : env(env) {
-    this->handle = env->NewGlobalRef(libcardinal::altenv_get_device_from_hardware_map(env, opmode, name, "com/qualcomm/robotcore/hardware/DcMotor"));
+HardwareDevice::HardwareDevice(JNIEnv *env, jobject opmode, const std::string& name,
+                               const std::string& classpath) : env(env) {
+    this->handle = env->NewGlobalRef(libcardinal::altenv_get_device_from_hardware_map(env, opmode, name, classpath));
 }
 
-DcMotor::~DcMotor() {
+HardwareDevice::~HardwareDevice() {
     this->env->DeleteGlobalRef(this->handle);
 }
 

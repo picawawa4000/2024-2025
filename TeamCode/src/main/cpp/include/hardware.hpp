@@ -4,22 +4,32 @@
 #include <jni.h>
 #include <string>
 
-struct DcMotor {
-    DcMotor(JNIEnv *env, jobject opmode, std::string name);
-    ~DcMotor();
+struct HardwareDevice {
+    HardwareDevice(JNIEnv *env, jobject opmode, const std::string& name, const std::string& classpath);
+    ~HardwareDevice();
 
+protected:
+    JNIEnv *env;
+    jobject handle;
+};
+
+struct DcMotor : public HardwareDevice {
+    DcMotor(JNIEnv *env, jobject opmode, const std::string& name) : HardwareDevice(env, opmode, name, "com/qualcomm/robotcore/hardware/DcMotor") {};
+    ~DcMotor() {};
+
+    //Power is expressed as a percentage of the motor's max
     void setPower(double power);
+
+    //Power is expressed as a percentage of the motor's max
     double getPower();
+
+    //True = reverse, false = forwards
     void setReverse(bool reverse);
 
     //This is one of those functions that we don't need until
     //we do. It's also one of those functions that is...
     //questionably written
     bool getReverse();
-
-private:
-    JNIEnv *env;
-    jobject handle;
 };
 
 #endif

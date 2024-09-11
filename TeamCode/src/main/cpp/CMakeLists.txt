@@ -30,8 +30,9 @@ target_include_directories(main PUBLIC include)
 
 # TODO: Fix these parts.
 
-set(SOURCES src/camera.cpp src/hardware.cpp include/camera.hpp include/hardware.hpp)
-add_executable(test ${SOURCES})
+set(HEADERS include/camera.hpp include/hardware.hpp)
+file(GLOB SOURCES src/*)
+add_executable(test ${HEADERS} ${SOURCES})
 
 target_include_directories(test PUBLIC include)
 
