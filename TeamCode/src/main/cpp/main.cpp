@@ -3,11 +3,8 @@
 #include <jni.h>
 #include <libcardinal.hpp>
 #include <camera.hpp>
+#include <hardware.hpp>
 #include <android/log.h>
-
-//#include <opencv2/core.hpp>
-
-#include <AprilTags/TagDetector.h>
 
 #define LOGGER_NAME "milk"
 #define print(...) __android_log_print(ANDROID_LOG_INFO, LOGGER_NAME, __VA_ARGS__)
@@ -23,8 +20,9 @@ auto log_lambda = [](const std::string& out){
 
 //Entry point for the program.
 void run(JNIEnv * env, jobject thiz) {
-    //Tell the camera library how to log
+    //Tell the libraries how to log
     camera::set_logger(log_lambda);
+    hardware::set_logger(log_lambda);
 }
 
 //Everything below here is a JNI wrapper function. Don't touch unless adding or removing one.

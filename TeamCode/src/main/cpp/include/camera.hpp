@@ -1,6 +1,12 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+/**
+ * The camera library.
+ * From the header file, it looks simple, but it's a mess,
+ * which is why it's not part of the hardware library.
+ * **/
+
 #include <jni.h>
 #include <functional>
 
