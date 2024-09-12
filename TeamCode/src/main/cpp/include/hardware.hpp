@@ -13,6 +13,14 @@ protected:
     jobject handle;
 };
 
+enum DcMotorZeroPowerBehaviour {
+    DCMOTOR_BRAKE,
+    DCMOTOR_FLOAT,
+    DCMOTOR_UNKNOWN
+};
+
+//No encoders; I don't think we'll need them
+//I may add a DcMotorEncoder class later though
 struct DcMotor : public HardwareDevice {
     DcMotor(JNIEnv *env, jobject opmode, const std::string& name) : HardwareDevice(env, opmode, name, "com/qualcomm/robotcore/hardware/DcMotor") {};
     ~DcMotor() {};
@@ -30,6 +38,10 @@ struct DcMotor : public HardwareDevice {
     //we do. It's also one of those functions that is...
     //questionably written
     bool getReverse();
+
+    void setZeroPowerBehaviour(DcMotorZeroPowerBehaviour behaviour);
+
+    DcMotorZeroPowerBehaviour getZeroPowerBehaviour();
 };
 
 #endif

@@ -66,3 +66,11 @@ bool DcMotor::getReverse() {
     //*fingers crossed*
     return current_enum_value == reverse;
 }
+
+void DcMotor::setZeroPowerBehaviour(DcMotorZeroPowerBehaviour behaviour) {
+
+}
+
+DcMotorZeroPowerBehaviour DcMotor::getZeroPowerBehaviour() {
+    return DCMOTOR_UNKNOWN;
+}
