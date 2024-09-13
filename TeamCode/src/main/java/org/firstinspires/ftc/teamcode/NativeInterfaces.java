@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.function.ContinuationResult;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureRequest;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSequenceId;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSession;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraFrame;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 
 /**
  * A wrapper class for native functions. Used when a Java function requires a handler.
@@ -24,7 +30,7 @@ public class NativeInterfaces {
         public native void onConfigured(@NonNull CameraCaptureSession session);
 
         @Override
-        public native void onClosed(@NonNull CameraCaptureSession session);
+        public void onClosed(@NonNull CameraCaptureSession session) {};
     }
 
     public static class StatusInterface implements CameraCaptureSession.StatusCallback {
@@ -41,5 +47,19 @@ public class NativeInterfaces {
 
         @Override
         public native void onNewFrame(@NonNull CameraCaptureSession session, @NonNull CameraCaptureRequest request, @NonNull CameraFrame cameraFrame);
+    }
+
+    public static class FrameSource implements CameraStreamSource {
+        @Override
+        public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+            continuation.dispatch((ContinuationResult<Consumer<Bitmap>>)(Consumer<Bitmap> sendFrameToDriverStation) -> {
+                Bitmap toSend = Bitmap.createBitmap(getFrame(), getXSize(), getYSize(), Bitmap.Config.RGB_565);
+                sendFrameToDriverStation.accept(toSend);
+            });
+        }
+
+        public native int[] getFrame();
+        public native int getXSize();
+        public native int getYSize();
     }
 }

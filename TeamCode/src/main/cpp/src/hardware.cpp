@@ -137,44 +137,46 @@ Gamepad::~Gamepad() {
 }
 
 void Gamepad::set_handler(
-        std::function<void(bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool,
+        std::function<void(JNIEnv*,bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool,
                            float, float, float, float)> ihandler) {
     this->handler = std::move(ihandler);
 }
 
-void Gamepad::tick() {
+void Gamepad::tick(JNIEnv* altenv) {
+    if (altenv == nullptr) altenv = this->env;
     this->handler(
-            this->get_bool_value("a"),
-            this->get_bool_value("b"),
-            this->get_bool_value("x"),
-            this->get_bool_value("y"),
-            this->get_bool_value("dpad_down"),
-            this->get_bool_value("dpad_up"),
-            this->get_bool_value("dpad_left"),
-            this->get_bool_value("dpad_right"),
-            this->get_bool_value("left_bumper"),
-            this->get_bool_value("right_bumper"),
-            this->get_bool_value("left_trigger"),
-            this->get_bool_value("right_trigger"),
-            this->get_float_value("left_stick_x"),
-            this->get_float_value("left_stick_y"),
-            this->get_float_value("right_stick_x"),
-            this->get_float_value("right_stick_y")
+            altenv,
+            this->get_bool_value(altenv, "a"),
+            this->get_bool_value(altenv, "b"),
+            this->get_bool_value(altenv, "x"),
+            this->get_bool_value(altenv, "y"),
+            this->get_bool_value(altenv, "dpad_down"),
+            this->get_bool_value(altenv, "dpad_up"),
+            this->get_bool_value(altenv, "dpad_left"),
+            this->get_bool_value(altenv, "dpad_right"),
+            this->get_bool_value(altenv, "left_bumper"),
+            this->get_bool_value(altenv, "right_bumper"),
+            this->get_bool_value(altenv, "left_trigger"),
+            this->get_bool_value(altenv, "right_trigger"),
+            this->get_float_value(altenv, "left_stick_x"),
+            this->get_float_value(altenv, "left_stick_y"),
+            this->get_float_value(altenv, "right_stick_x"),
+            this->get_float_value(altenv, "right_stick_y")
     );
 }
 
-bool Gamepad::get_bool_value(const std::string &name) {
+bool Gamepad::get_bool_value(JNIEnv *altenv, const std::string &name) {
     return libcardinal::altenv_get_field(
-            this->env,
+            altenv,
             this->handle,
             name.c_str(),
             "Z"
     ).z == JNI_TRUE;
 }
 
-float Gamepad::get_float_value(const std::string &name) {
+float Gamepad::get_float_value(JNIEnv *altenv, const std::string &name) {
     return libcardinal::altenv_get_field(
-            this->env,
+            altenv,
             this->handle,
             name.c_str(),
             "F"

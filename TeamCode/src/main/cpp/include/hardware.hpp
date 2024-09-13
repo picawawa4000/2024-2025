@@ -63,21 +63,20 @@ struct Gamepad {
     //Argument format (here we go...):
     //bool:  a, b, x, y, dpad_down, dpad_up, dpad_left, dpad_right, bumper_left, bumper_right, trigger_left, trigger_right
     //float: stick_left_x, stick_left_y, stick_right_x, stick_right_y
-    void set_handler(std::function<void(bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,float,float,float,float)> handler);
+    void set_handler(std::function<void(JNIEnv *, bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,bool,float,float,float,float)> handler);
 
     //Calls handler()
     //Should be called in a loop
-    //Even if it's in another thread, handler can simply capture the env, so we won't pass one
-    void tick();
+    void tick(JNIEnv * env = nullptr);
 
 private:
     JNIEnv * env;
     jobject handle;
     //so many arguments!!
-    std::function<void(bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, float, float, float, float)> handler;
+    std::function<void(JNIEnv *, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, bool, float, float, float, float)> handler;
 
-    bool get_bool_value(const std::string& name);
-    float get_float_value(const std::string& name);
+    bool get_bool_value(JNIEnv *altenv, const std::string& name);
+    float get_float_value(JNIEnv *altenv, const std::string& name);
 };
 
 #endif

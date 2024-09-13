@@ -12,7 +12,7 @@ void set_logger(std::function<void(std::string)> logger) {
     output = std::move(logger);
 }
 
-Camera::Camera(JNIEnv *env, jobject opmode) : env(env), recording(false) {
+Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), recording(false), userxsize(xsize), userysize(ysize) {
     //Gets the name of the camera, which is more or less an interface to the camera
     jobject cameraName = libcardinal::get_device_from_hardware_map(opmode, "webcam");
 
@@ -53,6 +53,7 @@ Camera::Camera(JNIEnv *env, jobject opmode) : env(env), recording(false) {
             libcardinal::to_jvalue(nullptr)
     ).l);
 
+    //Not entirely sure why I need this
     this->cameraCharacteristics = env->NewGlobalRef(
             libcardinal::altenv_call_instance(
                     env,
@@ -69,6 +70,7 @@ Camera::Camera(JNIEnv *env, jobject opmode) : env(env), recording(false) {
             ).l
     );
 
+    //Same as above
     this->serialThreadPool = this->env->NewGlobalRef(libcardinal::altenv_call_instance(
             this->env,
             this->cameraManager,
@@ -147,8 +149,8 @@ void Camera::onConfigured(JNIEnv *altenv, jobject cameraCaptureSession) {
             altenv,
             "org/firstinspires/ftc/robotcore/external/android/util/Size",
             "(II)V",
-            libcardinal::to_jvalue(640),
-            libcardinal::to_jvalue(480)
+            libcardinal::to_jvalue(this->userxsize),
+            libcardinal::to_jvalue(this->userysize)
     );
     jvalue androidImageFormat = libcardinal::altenv_get_static_field(
             altenv,
@@ -159,7 +161,7 @@ void Camera::onConfigured(JNIEnv *altenv, jobject cameraCaptureSession) {
     );
 
     //Gets the maximum frames per second for our desired camera configuration
-    //(640x480 resolution, YUYV/YUY2 format)
+    //(dynamic resolution, YUYV/YUY2 format)
     int maxFramesPerSecond = libcardinal::altenv_call_instance(
             altenv,
             this->cameraCharacteristics,
@@ -180,8 +182,8 @@ void Camera::onConfigured(JNIEnv *altenv, jobject cameraCaptureSession) {
             altenv,
             "org/firstinspires/ftc/robotcore/internal/vuforia/externalprovider/CameraMode",
             "(IIILorg/firstinspires/ftc/robotcore/internal/vuforia/externalprovider/FrameFormat;)V",
-            libcardinal::to_jvalue(640),
-            libcardinal::to_jvalue(480),
+            libcardinal::to_jvalue(this->userxsize),
+            libcardinal::to_jvalue(this->userysize),
             maxFramesPerSecond,
             androidImageFormat
     );
@@ -244,6 +246,41 @@ void Camera::onNewFrame(JNIEnv *altenv, jobject camera_frame) {
     this->frameHandler(altenv, this->xsize, this->ysize, frame_data);
 }
 
+void CameraStream::init(JNIEnv *env) {
+    jobject cameraStreamServer = libcardinal::altenv_call_static(
+            env,
+            env->FindClass("org/firstinspires/ftc/robotcore/external/stream/CameraStreamServer"),
+            "getInstance",
+            "()Lorg/firstinspires/ftc/robotcore/external/stream/CameraStreamServer;",
+            nullptr
+    ).l;
+    jobject cameraStreamSource = libcardinal::altenv_alloc_instance(
+            env,
+            "org/firstinspires/ftc/teamcode/NativeInterfaces$FrameSource"
+    );
+    libcardinal::altenv_call_void_instance(
+            env,
+            cameraStreamServer,
+            "setSource",
+            "(Lorg/firstinspires/ftc/robotcore/external/stream/CameraStreamSource;)V",
+            libcardinal::to_jvalue(cameraStreamSource)
+    );
+}
+
+void CameraStream::send(int x_size, int y_size, unsigned char *framedata) {
+    this->xsize = x_size;
+    this->ysize = y_size;
+    this->frame = framedata;
+}
+
+CameraStream * CameraStream::get(JNIEnv *env) {
+    if (CameraStream::instancePtr == nullptr) {
+        CameraStream::init(env);
+        CameraStream::instancePtr = new CameraStream();
+    }
+    return CameraStream::instancePtr;
+}
+
 //More JNI wrapper functions!
 
 extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024StateInterface_onConfigured(
@@ -251,13 +288,31 @@ extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_NativeInte
     Camera * thisptr = (Camera*)libcardinal::altenv_get_field(env, thiz, "thisptr", "J").j;
     thisptr->onConfigured(env, session);
 }
-extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024StateInterface_onClosed(
-        JNIEnv *env, jobject thiz, jobject session) {
-    // TODO: implement onClosed()
-}
+
 extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024CaptureInterface_onNewFrame(
         JNIEnv *env, jobject thiz, jobject session,
         jobject request, jobject camera_frame) {
     Camera * thisptr = (Camera*)libcardinal::altenv_get_field(env, thiz, "thisptr", "J").j;
     thisptr->onNewFrame(env, camera_frame);
+}
+
+extern "C" JNIEXPORT jintArray JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024FrameSource_getFrame(
+        JNIEnv *env, jobject thiz) {
+    unsigned char * data = CameraStream::get(env)->frame;
+    jsize len = CameraStream::get(env)->xsize * CameraStream::get(env)->ysize;
+    //how to convert data from ubyte* to int*?
+    std::vector<unsigned char> charvec(len, data);
+    jintArray jints = env->NewIntArray(len);
+    env->SetIntArrayRegion(jints, 0, len, data);
+    return jints;
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024FrameSource_getXSize(
+        JNIEnv *env, jobject thiz) {
+    return (jint)(CameraStream::get(env)->xsize);
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024FrameSource_getYSize(
+        JNIEnv *env, jobject thiz) {
+    return (jint)(CameraStream::get(env)->ysize);
 }
