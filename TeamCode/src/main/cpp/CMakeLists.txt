@@ -12,7 +12,7 @@ project("main")
 
 # Finds OpenCV, which is in libs/OpenCV-android-sdk in the root folder
 
-set(OpenCV_DIR /Users/academia/2024-2025/libs/OpenCV-android-sdk/sdk/native/jni)
+set(OpenCV_DIR /Users/academia/2024-2025-B/libs/OpenCV-android-sdk/sdk/native/jni)
 find_package(OpenCV REQUIRED)
 
 # Creates and names a library, sets it as either STATIC
@@ -35,7 +35,7 @@ target_include_directories(main PUBLIC include)
 
 # TODO: Fix these parts.
 
-set(SOURCES src/camera.cpp src/hardware.cpp include/camera.hpp include/hardware.hpp)
+set(SOURCES src/camera.cpp src/hardware.cpp src/cvlib.cpp include/camera.hpp include/hardware.hpp include/cvlib.hpp)
 
 file(GLOB APRILTAGS_H include/AprilTags/*)
 file(GLOB APRILTAGS_S src/AprilTags/*)
@@ -69,3 +69,5 @@ target_link_libraries( # Specifies the target library.
                        ${log-lib}
 
                        ${OpenCV_LIBS})
+
+target_link_libraries(test ${log-lib} ${OpenCV_LIBS})

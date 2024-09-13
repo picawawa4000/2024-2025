@@ -1,19 +1,18 @@
 //Don't forget to configure the file settings in CMakeLists.txt when adding a library!
 
 #include <jni.h>
+#include <android/log.h>
+
 #include <libcardinal.hpp>
 #include <camera.hpp>
 #include <hardware.hpp>
-#include <android/log.h>
+#include <cvlib.hpp>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
 #define LOGGER_NAME "milk"
 #define print(...) __android_log_print(ANDROID_LOG_INFO, LOGGER_NAME, __VA_ARGS__)
-
-//I don't know if I'll wind up keeping this or not...
-using namespace libcardinal;
 
 //The logging function that we use when one of my libraries
 //wants a logging function

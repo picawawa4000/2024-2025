@@ -281,6 +281,16 @@ CameraStream * CameraStream::get(JNIEnv *env) {
     return CameraStream::instancePtr;
 }
 
+//Helper function to make greyscale image render properly
+//This function is really poorly written
+std::vector<int> widenToInt(jsize len, const unsigned char * data) {
+    std::vector<int> ret(len);
+    for (int i = 0; i < len; ++i) {
+        ret[i] = (data[len] << 24) + (data[len] << 16) + (data[len] << 8) + data[len];
+    }
+    return ret;
+}
+
 //More JNI wrapper functions!
 
 extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_NativeInterfaces_00024StateInterface_onConfigured(
@@ -300,10 +310,9 @@ extern "C" JNIEXPORT jintArray JNICALL Java_org_firstinspires_ftc_teamcode_Nativ
         JNIEnv *env, jobject thiz) {
     unsigned char * data = CameraStream::get(env)->frame;
     jsize len = CameraStream::get(env)->xsize * CameraStream::get(env)->ysize;
-    //how to convert data from ubyte* to int*?
-    std::vector<unsigned char> charvec(len, data);
+    std::vector<int> idata = widenToInt(len, data);
     jintArray jints = env->NewIntArray(len);
-    env->SetIntArrayRegion(jints, 0, len, data);
+    env->SetIntArrayRegion(jints, 0, len, idata.data());
     return jints;
 }
 
