@@ -9,12 +9,12 @@ using namespace cvlib;
 
 const double mm_per_tile = 11./18.;
 const PosRot aprilTagTransforms[] = {
-        {.x=1,.y=6,.angle=0.},
-        {.x=0,.y=3,.angle=CV_PI/2.},
-        {.x=1,.y=0,.angle=CV_PI},
-        {.x=5,.y=0,.angle=CV_PI},
-        {.x=6,.y=3,.angle=3.*CV_PI/2.},
-        {.x=5,.y=6,.angle=0.}
+        {.x=1.,.y=6.,.angle=0.},
+        {.x=0.,.y=3.,.angle=CV_PI/2.},
+        {.x=1.,.y=0.,.angle=CV_PI},
+        {.x=5.,.y=0.,.angle=CV_PI},
+        {.x=6.,.y=3.,.angle=3.*CV_PI/2.},
+        {.x=5.,.y=6.,.angle=0.}
 };
 
 inline PosRot getAprilTagTransform(int aprilTagID) {
@@ -71,5 +71,13 @@ PosRot getPlayingFieldPos(const cv::Mat& frame) {
     //We calculate the yaw of the robot
     double robotYaw = absoluteYaw - yaw;
 
+    //We rotate the relative translation vector so that its axes agree with the AprilTag's
+    Eigen::Matrix2d rotationMatrix;
+    rotationMatrix << cos(robotYaw), sin(robotYaw), -sin(robotYaw), cos(robotYaw);
+    Eigen::Vector2d aprilTagTrans = rotationMatrix * translation2d;
 
+    //Finally, we figure out where on the field the robot is
+    Eigen::Vector2d robotPos = aprilTagTrans + absoluteTrans;
+
+    return {.x=robotPos[0],.y=robotPos[1],.angle=robotYaw};
 }

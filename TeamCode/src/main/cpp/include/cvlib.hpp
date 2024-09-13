@@ -5,8 +5,7 @@
 
 namespace cvlib {
     struct PosRot {
-        int x, y;
-        double angle;
+        double x, y, angle;
     };
 
     /**
