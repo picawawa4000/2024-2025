@@ -26,6 +26,7 @@ struct Camera {
     ~Camera();
 
     //Starts a recording, passing every frame to handler
+    //Fails if the camera is already recording
     //Keep in mind that the handler runs in a different thread
     //than the main program, and thus has a different JNIEnv *
     //Argument format to handler: env, xsize, ysize, data

@@ -10,6 +10,7 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 
 #define LOGGER_NAME "milk"
 #define print(...) __android_log_print(ANDROID_LOG_INFO, LOGGER_NAME, __VA_ARGS__)
@@ -36,9 +37,28 @@ void run(JNIEnv * env, jobject thiz) {
     camera.record(camera_handler);
 }
 
+//No shot it's this simple
+void cvCameraRun(JNIEnv * env, jobject thiz) {
+    libcardinal::altenv_call_instance(
+            env,
+            thiz,
+            "waitForStart",
+            "()V",
+            nullptr
+    );
+    cv::VideoCapture cap(0);
+    cap.open(0);
+    cv::Mat image;
+    cap >> image;
+    print("OpenCV camera test successful! (By some minor miracle...)");
+}
+
 //Everything below here is a JNI wrapper function. Don't touch unless adding or removing one.
 
 extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_RemoteOperation_run(
         JNIEnv *env, jobject thiz) {
     run(env, thiz);
+}
+extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_OpenCVCameraTest_runOpMode(JNIEnv *env, jobject thiz) {
+    cvCameraRun(env, thiz);
 }

@@ -3,6 +3,15 @@
 
 #include <opencv2/core.hpp>
 
+/**
+ * This library currently contains one function that is used
+ * to determine where on the field the robot is.
+ * Libraries that are utilised:
+ * AprilTags (to find the AprilTags),
+ * OpenCV (to store and process frames, NOT to connect to the camera),
+ * Eigen (for linear algebra)
+ * **/
+
 namespace cvlib {
     struct PosRot {
         double x, y, angle;

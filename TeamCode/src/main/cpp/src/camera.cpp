@@ -89,7 +89,7 @@ Camera::~Camera() {
 
 void Camera::record(std::function<void(JNIEnv*,int,int,std::vector<unsigned char>)> handler) {
     if (this->recording) {
-        output("WARNING: Camera attempted to start second recording session.");
+        output("WARNING: Camera attempted to start second recording session. Terminate currently running one first.");
         return;
     }
     this->recording = true;

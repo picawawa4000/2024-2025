@@ -38,8 +38,6 @@ void matToEuler(const Eigen::Matrix3d& rotationMatrix, double& yaw, double& pitc
 }
 
 PosRot getPlayingFieldPos(const cv::Mat& frame) {
-    //
-
     //We find any AprilTags in the picture
     AprilTags::TagDetector detector(AprilTags::tagCodes36h11);
     std::vector<AprilTags::TagDetection> tags = detector.extractTags(frame);
