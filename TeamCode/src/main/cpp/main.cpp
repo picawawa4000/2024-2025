@@ -37,6 +37,19 @@ void run(JNIEnv * env, jobject thiz) {
     camera.record(camera_handler);
 }
 
+void printMat(cv::Mat mat) {
+    std::string out = "[";
+    for (int i = 0; i < mat.cols; ++i) {
+        out += "[";
+        for (int j = 0; j < mat.rows; ++j) {
+            out += std::to_string(mat.at<int>(j, i)) + ", ";
+        }
+        out += "],";
+    }
+    out += "]";
+    print("%s", out.c_str());
+}
+
 //No shot it's this simple
 void cvCameraRun(JNIEnv * env, jobject thiz) {
     libcardinal::altenv_call_instance(
@@ -50,6 +63,7 @@ void cvCameraRun(JNIEnv * env, jobject thiz) {
     cap.open(0);
     cv::Mat image;
     cap >> image;
+    printMat(image);
     print("OpenCV camera test successful! (By some minor miracle...)");
 }
 

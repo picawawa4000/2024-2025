@@ -2,6 +2,7 @@
 
 This repository contains the public FTC SDK for the CENTERSTAGE (2023-2024) competition season.
 Yes, you read that right, the SDK is outdated. And I don't care.
+That does mean that this project is illegal to use in competitions, though. So I might update it.
 
 ## Welcome!
 
@@ -11,7 +12,5 @@ I don't like some of the choices that they made regarding programming languages.
 ## The Goal
 
 To create a proper autonomous operational mode using OpenCV and AprilTags.
-
 Am I using some unorthodox constructions?
-
 Yes. Shamelessly.
