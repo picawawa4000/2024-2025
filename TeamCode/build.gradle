@@ -20,7 +20,7 @@ android {
     defaultConfig {
         externalNativeBuild {
             cmake {
-                arguments "-DLIBS_DIR=../libs"
+                arguments "-DLIBS_DIR=../libs -fdeclspec"
                 cppFlags ''
             }
         }
