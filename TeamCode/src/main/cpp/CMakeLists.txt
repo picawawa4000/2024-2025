@@ -35,14 +35,12 @@ target_include_directories(main PUBLIC include)
 
 # TODO: Fix these parts.
 
-set(SOURCES src/camera.cpp src/hardware.cpp src/cvlib.cpp include/camera.hpp include/hardware.hpp include/cvlib.hpp)
+set(SOURCES src/camera.cpp src/hardware.cpp src/cvlib.cpp src/libcardinal.cpp include/camera.hpp include/hardware.hpp include/cvlib.hpp include/libcardinal.hpp)
 
 file(GLOB APRILTAGS_H include/AprilTags/*)
 file(GLOB APRILTAGS_S src/AprilTags/*)
 
-add_executable(test ${SOURCES} ${APRILTAGS_S} ${APRILTAGS_H})
-
-target_include_directories(test PUBLIC include)
+target_sources(main PUBLIC ${SOURCES} ${APRILTAGS_S} ${APRILTAGS_H})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -61,6 +59,8 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
+#target_link_libraries(test ${log-lib} ${OpenCV_LIBS})
+
 target_link_libraries( # Specifies the target library.
                        main
 
@@ -68,6 +68,6 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib}
 
-                       ${OpenCV_LIBS})
-
-target_link_libraries(test ${log-lib} ${OpenCV_LIBS})
+                       ${OpenCV_LIBS}
+        #test
+        )

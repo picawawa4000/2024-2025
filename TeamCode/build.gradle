@@ -16,12 +16,13 @@ apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
 android {
+    ndkVersion "26.2.11394342"
 
     defaultConfig {
         externalNativeBuild {
             cmake {
-                arguments "-DLIBS_DIR=../libs -fdeclspec"
-                cppFlags ''
+                arguments "-DLIBS_DIR=../libs"
+                cppFlags '-fdeclspec'
             }
         }
     }

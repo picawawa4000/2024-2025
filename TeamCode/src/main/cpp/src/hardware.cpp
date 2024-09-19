@@ -2,10 +2,10 @@
 #include <libcardinal.hpp>
 #include <utility>
 
-std::function<void(std::string)> output;
+std::function<void(std::string)> houtput;
 
 void hardware::set_logger(std::function<void(std::string)> logger) {
-    output = std::move(logger);
+    houtput = std::move(logger);
 }
 
 HardwareDevice::HardwareDevice(JNIEnv *env, jobject opmode, const std::string& name,
@@ -76,7 +76,7 @@ bool DcMotor::getReverse() {
 
 void DcMotor::setZeroPowerBehaviour(DcMotorZeroPowerBehaviour behaviour) {
     if (behaviour != DCMOTOR_BRAKE and behaviour != DCMOTOR_FLOAT) {
-        output("WARNING: Trying to call DcMotor::setZeroPowerBehaviour(UNKNOWN). Problems may occur.");
+        houtput("WARNING: Trying to call DcMotor::setZeroPowerBehaviour(UNKNOWN). Problems may occur.");
     }
     //Again, this is how we get enum values
     jobject enum_value = libcardinal::altenv_get_static_field(

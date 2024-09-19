@@ -6,10 +6,10 @@
 #include <utility>
 #include "libcardinal.hpp"
 
-std::function<void(std::string)> output;
+std::function<void(std::string)> coutput;
 
 void set_logger(std::function<void(std::string)> logger) {
-    output = std::move(logger);
+    coutput = std::move(logger);
 }
 
 Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), recording(false), userxsize(xsize), userysize(ysize) {
@@ -89,7 +89,7 @@ Camera::~Camera() {
 
 void Camera::record(std::function<void(JNIEnv*,int,int,std::vector<unsigned char>)> handler) {
     if (this->recording) {
-        output("WARNING: Camera attempted to start second recording session. Terminate currently running one first.");
+        coutput("WARNING: Camera attempted to start second recording session. Terminate currently running one first.");
         return;
     }
     this->recording = true;
