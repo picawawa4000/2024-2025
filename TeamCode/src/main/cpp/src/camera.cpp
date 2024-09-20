@@ -8,7 +8,7 @@
 
 std::function<void(std::string)> coutput;
 
-void set_logger(std::function<void(std::string)> logger) {
+void camera::set_logger(std::function<void(std::string)> logger) {
     coutput = std::move(logger);
 }
 
@@ -100,7 +100,7 @@ void Camera::record(std::function<void(JNIEnv*,int,int,std::vector<unsigned char
             this->env,
             "org/firstinspires/ftc/teamcode/NativeInterfaces$StateInterface",
             "(J)V",
-            libcardinal::to_jvalue((long)this)
+            libcardinal::to_jvalue((jlong)this)
     );
 
     this->currentCaptureSession = this->env->NewGlobalRef(libcardinal::altenv_call_instance(
@@ -216,7 +216,7 @@ void Camera::onConfigured(JNIEnv *altenv, jobject cameraCaptureSession) {
                     altenv,
                     "org/firstinspires/ftc/teamcode/NativeInterfaces$CaptureInterface",
                     "(J)V",
-                    libcardinal::to_jvalue((long)this)
+                    libcardinal::to_jvalue((jlong)this)
             ),
             libcardinal::altenv_call_static(
                     altenv,
@@ -245,6 +245,9 @@ void Camera::onNewFrame(JNIEnv *altenv, jobject camera_frame) {
     std::vector<unsigned char> frame_data(rdata, rdata + length - 1);
     this->frameHandler(altenv, this->xsize, this->ysize, frame_data);
 }
+
+//...why is this necessary again?
+CameraStream * CameraStream::instancePtr;
 
 void CameraStream::init(JNIEnv *env) {
     jobject cameraStreamServer = libcardinal::altenv_call_static(
@@ -282,7 +285,7 @@ CameraStream * CameraStream::get(JNIEnv *env) {
 }
 
 //Helper function to make greyscale image render properly
-//This function is really poorly written
+//This function is really poorly written and could be a lot faster
 std::vector<int> widenToInt(jsize len, const unsigned char * data) {
     std::vector<int> ret(len);
     for (int i = 0; i < len; ++i) {
