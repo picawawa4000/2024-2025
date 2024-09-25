@@ -24,6 +24,7 @@ auto log_lambda = [](const std::string& out){
 };
 
 auto camera_handler = [](JNIEnv * env, int xsize, int ysize, std::vector<unsigned char> frameraw) {
+    print("Got frame from camera, processing...");
     cv::Mat frame(xsize, ysize, CV_8UC2, &frameraw[0]);
     cv::cvtColor(frame, frame, cv::COLOR_YUV2GRAY_YUYV);
     CameraStream::get(env)->send(xsize, ysize, frame.data);
@@ -31,16 +32,29 @@ auto camera_handler = [](JNIEnv * env, int xsize, int ysize, std::vector<unsigne
 
 //Entry point for the program.
 void run(JNIEnv * env, jobject thiz) {
+    //This should hopefully not be necessary...
+    libcardinal::setenv(env);
+
     //Tell the libraries how to log
     camera::set_logger(log_lambda);
     hardware::set_logger(log_lambda);
 
+    libcardinal::altenv_call_void_instance(
+            env,
+            thiz,
+            "waitForStart",
+            "()V",
+            nullptr
+    );
+
+    print("About to create camera...");
     Camera camera(env, thiz, 640, 480);
+    print("Camera successfully created...");
     camera.record(camera_handler);
 }
 
 void printMat(cv::Mat mat) {
-    std::string out = "[";
+    std::string out = "mat " + std::to_string(mat.rows) + "x" + std::to_string(mat.cols) + " [";
     for (int i = 0; i < mat.cols; ++i) {
         out += "[";
         for (int j = 0; j < mat.rows; ++j) {
@@ -52,29 +66,9 @@ void printMat(cv::Mat mat) {
     print("%s", out.c_str());
 }
 
-//No shot it's this simple
-void cvCameraRun(JNIEnv * env, jobject thiz) {
-    libcardinal::altenv_call_instance(
-            env,
-            thiz,
-            "waitForStart",
-            "()V",
-            nullptr
-    );
-    cv::VideoCapture cap(0);
-    cap.open(0);
-    cv::Mat image;
-    cap >> image;
-    printMat(image);
-    print("OpenCV camera test successful! (By some minor miracle...)");
-}
-
 //Everything below here is a JNI wrapper function. Don't touch unless adding or removing one.
 
 extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_RemoteOperation_run(
         JNIEnv *env, jobject thiz) {
     run(env, thiz);
-}
-extern "C" JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_OpenCVCameraTest_runOpMode(JNIEnv *env, jobject thiz) {
-    cvCameraRun(env, thiz);
 }

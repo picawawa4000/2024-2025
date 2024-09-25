@@ -588,7 +588,7 @@ namespace libcardinal {
         jvalue args[2] = {{.l=libcardinal::jnienv->FindClass(idClass.c_str())},
                           {.l=libcardinal::jnienv->NewStringUTF(id.c_str())}};
         jobject item = libcardinal::call_instance(hardwareMap, "get",
-                                                  "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Object;",
+                                                  "(Ljava/lang/Class;Ljava/lang/String;)Lcom/qualcomm/robotcore/hardware/HardwareDevice;",
                                                   args).l;
         libcardinal::jnienv->DeleteLocalRef(args[0].l);
         return libcardinal::jnienv->NewGlobalRef(item);
@@ -601,7 +601,7 @@ namespace libcardinal {
         jvalue args[2] = {{.l=env->NewLocalRef(env->FindClass(idClass.c_str()))},
                           {.l=env->NewLocalRef(env->NewStringUTF(id.c_str()))}};
         jobject item = libcardinal::altenv_call_instance(env, hardwareMap, "get",
-                                                         "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Object;",
+                                                         "(Ljava/lang/Class;Ljava/lang/String;)Lcom/qualcomm/robotcore/hardware/HardwareDevice;",
                                                          args).l;
         env->DeleteLocalRef(args[0].l);
         env->DeleteLocalRef(args[1].l);
@@ -613,7 +613,7 @@ namespace libcardinal {
         jobject hardwareMap = libcardinal::get_hardware_map(opMode);
         jvalue args[1] = {{.l=libcardinal::jnienv->NewStringUTF(id.c_str())}};
         jobject item = libcardinal::call_instance(hardwareMap, "get",
-                                                  "(Ljava/lang/String;)Ljava/lang/Object;",
+                                                  "(Ljava/lang/String;)Lcom/qualcomm/robotcore/hardware/HardwareDevice;",
                                                   args).l;
         return libcardinal::jnienv->NewGlobalRef(item);
     }
@@ -623,7 +623,7 @@ namespace libcardinal {
         jobject hardwareMap = libcardinal::altenv_get_hardware_map(env, opMode);
         jvalue args[1] = {{.l=env->NewStringUTF(id.c_str())}};
         jobject item = libcardinal::altenv_call_instance(env, hardwareMap, "get",
-                                                         "(Ljava/lang/String;)Ljava/lang/Object;",
+                                                         "(Ljava/lang/String;)Lcom/qualcomm/robotcore/hardware/HardwareDevice;",
                                                          args).l;
         return env->NewGlobalRef(item);
     }

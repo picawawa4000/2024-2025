@@ -13,8 +13,12 @@ void camera::set_logger(std::function<void(std::string)> logger) {
 }
 
 Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), recording(false), userxsize(xsize), userysize(ysize) {
+    coutput("Camera::Camera()");
+
     //Gets the name of the camera, which is more or less an interface to the camera
-    jobject cameraName = libcardinal::get_device_from_hardware_map(opmode, "webcam");
+    jobject cameraName = libcardinal::altenv_get_device_from_hardware_map(env, opmode, "webcam");
+
+    coutput("Got camera from hardware map...");
 
     //Creates a new camera manager, which manages our cameras
     this->cameraManager = env->NewGlobalRef(libcardinal::altenv_call_instance(
@@ -31,27 +35,39 @@ Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), re
             nullptr
     ).l);
 
+    coutput("Getting time unit...");
+
+    jvalue timeUnit = libcardinal::altenv_get_static_field(
+            env,
+            env->FindClass("java/util/concurrent/TimeUnit"),
+            "MILLISECONDS",
+            "Ljava/util/concurrent/TimeUnit;"
+    );
+
+    coutput("Creating deadline...");
+
+    jobject deadline = libcardinal::altenv_new_instance(
+            env,
+            "org/firstinspires/ftc/robotcore/internal/system/Deadline",
+            "(JLjava/util/concurrent/TimeUnit;)V",
+            libcardinal::to_jvalue((jlong)5000),
+            timeUnit
+    );
+
+    coutput("About to get camera object from Java...");
+
     //Actually creates the camera object
     this->camera = env->NewGlobalRef(libcardinal::altenv_call_instance(
             env,
             this->cameraManager,
             "requestPermissionAndOpenCamera",
             "(Lorg/firstinspires/ftc/robotcore/internal/system/Deadline;Lorg/firstinspires/ftc/robotcore/external/hardware/camera/CameraName;Lorg/firstinspires/ftc/robotcore/external/function/Continuation;)Lorg/firstinspires/ftc/robotcore/external/hardware/camera/Camera;",
-            libcardinal::to_jvalue(libcardinal::altenv_new_instance(
-                    env,
-                    "org/firstinspires/ftc/robotcore/internal/system/Deadline",
-                    "(JLjava/util/concurrent/TimeUnit;)V",
-                    libcardinal::to_jvalue((jlong)5000),
-                    libcardinal::altenv_get_static_field(
-                            env,
-                            env->FindClass("java/util/concurrent/TimeUnit"),
-                            "MILLISECONDS",
-                            "Ljava/util/concurrent/TimeUnit;"
-                    )
-            )),
+            libcardinal::to_jvalue(deadline),
             libcardinal::to_jvalue(cameraName),
             libcardinal::to_jvalue(nullptr)
     ).l);
+
+    coutput("Got camera object from Java...");
 
     //Not entirely sure why I need this
     this->cameraCharacteristics = env->NewGlobalRef(
