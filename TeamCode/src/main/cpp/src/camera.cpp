@@ -37,21 +37,22 @@ Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), re
 
     coutput("Getting time unit...");
 
-    jvalue timeUnit = libcardinal::altenv_get_static_field(
+    jobject timeUnit = libcardinal::altenv_get_static_field(
             env,
             env->FindClass("java/util/concurrent/TimeUnit"),
             "MILLISECONDS",
             "Ljava/util/concurrent/TimeUnit;"
-    );
+    ).l;
 
     coutput("Creating deadline...");
 
+    //this line breaks down
     jobject deadline = libcardinal::altenv_new_instance(
             env,
             "org/firstinspires/ftc/robotcore/internal/system/Deadline",
             "(JLjava/util/concurrent/TimeUnit;)V",
             libcardinal::to_jvalue((jlong)5000),
-            timeUnit
+            libcardinal::to_jvalue(timeUnit)
     );
 
     coutput("About to get camera object from Java...");
