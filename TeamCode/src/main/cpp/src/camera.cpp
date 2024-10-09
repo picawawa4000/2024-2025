@@ -44,7 +44,7 @@ Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), re
             "Ljava/util/concurrent/TimeUnit;"
     ).l;
 
-    coutput("Creating deadline...");
+    coutput("Creating deadline with timeUnit at address " + std::to_string((__uint64_t)timeUnit) + " ...");
 
     //this line breaks down
     jobject deadline = libcardinal::altenv_new_instance(
@@ -55,6 +55,7 @@ Camera::Camera(JNIEnv *env, jobject opmode, int xsize, int ysize) : env(env), re
             libcardinal::to_jvalue(timeUnit)
     );
 
+    coutput("timeUnit address equals " + std::to_string((__uint64_t)timeUnit) + " ...");
     coutput("About to get camera object from Java...");
 
     //Actually creates the camera object
